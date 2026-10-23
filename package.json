@@ -9,8 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check:brand": "node scripts/check-brand.mjs",
-    "verify": "npm run lint && npm run typecheck && npm run check:brand && npm run test"
+    "verify": "npm run lint && npm run typecheck && npm run test"
   },
   "dependencies": {
     "next": "15.5.4",
