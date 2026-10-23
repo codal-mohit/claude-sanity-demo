@@ -12,10 +12,15 @@
     "verify": "npm run lint && npm run typecheck && npm run test"
   },
   "dependencies": {
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^5.31.2",
     "class-variance-authority": "^0.7.1",
     "next": "15.5.4",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "next-sanity": "^11.6.13",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "sanity": "^5.31.2",
+    "styled-components": "^6.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
