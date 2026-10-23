@@ -14,7 +14,7 @@ Before writing:
 
 While writing:
 
-- Brand utilities only. No raw colors, no palette colors, no new fonts.
+- Prefer brand utilities. Other colors are allowed when the task needs them.
 - Add or update a co-located test for every component you touch.
 - No new dependencies. If one seems needed, stop and say why.
 

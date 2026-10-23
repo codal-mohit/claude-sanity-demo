@@ -9,7 +9,7 @@ export type BreadcrumbProps = {
   items: BreadcrumbItem[];
 };
 
-/** Breadcrumb trail. Uses DM Mono per brand rules. The last item is the current page. */
+/** Breadcrumb trail. Uses the mono font token. The last item is the current page. */
 export function Breadcrumb({ items }: BreadcrumbProps) {
   return (
     <nav aria-label="Breadcrumb" className="font-mono text-xs">

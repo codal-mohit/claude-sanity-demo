@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 
 export type TagProps = HTMLAttributes<HTMLSpanElement>;
 
-/** Small label. Uses DM Mono per brand rules for tags. */
+/** Small label. Uses the mono font token. */
 export function Tag({ className, ...props }: TagProps) {
   return (
     <span

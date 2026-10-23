@@ -10,7 +10,7 @@ Source of truth for project context. The `repo-overview` skill and the `code-ana
 | UI | React 19, Server Components by default |
 | Language | TypeScript, strict mode, `@/*` maps to `src/*` |
 | Styling | Tailwind CSS v4, tokens declared with `@theme inline` in `globals.css` |
-| Fonts | DM Sans (`font-sans`), DM Mono (`font-mono`) via `next/font/google` |
+| Fonts | Manrope (`font-sans`, `font-mono`) via `next/font/google` |
 | Tests | Vitest, jsdom, Testing Library |
 | Lint | ESLint 9 with `eslint-config-next` |
 
@@ -44,8 +44,8 @@ CLAUDE.md                project instructions loaded every session
 | `Price` | Price display | strikes through `compareAt` when on sale |
 | `ImagePlaceholder` | Image stand-in | `role="img"` with a label |
 | `Card` | Content tile | optional `tag` and `footer` |
-| `Tag` | Small label | DM Mono, uppercase |
-| `Breadcrumb` | Navigation trail | DM Mono, last item is `aria-current="page"` |
+| `Tag` | Small label | Manrope, uppercase |
+| `Breadcrumb` | Navigation trail | Manrope, last item is `aria-current="page"` |
 | `Alert` | Inline message | `info` / `emphasis` tones, `role="status"` |
 
 ## Routes and sections

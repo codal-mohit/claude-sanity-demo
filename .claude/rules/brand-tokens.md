@@ -26,12 +26,12 @@ Usage:
 
 Type:
 
-- `font-sans` (DM Sans): headlines and body.
-- `font-mono` (DM Mono): small links, breadcrumbs, tags.
+- `font-sans` (Manrope): headlines and body.
+- `font-mono` (Manrope): small links, breadcrumbs, tags.
 
 Rules:
 
-- Never write hex, rgb or hsl values outside `globals.css`. Never use Tailwind palette colors (`bg-blue-500`, `text-gray-700`) or arbitrary colors (`text-[#123456]`).
-- Need a new color? Add a token to `globals.css` for both themes, then use the utility.
+- Prefer the brand tokens above for default UI. They are a default, not a limit.
+- Other colors are allowed when the task needs them (Tailwind palette colors, arbitrary values, hex in components). Keep them readable in both light and dark themes.
 - Headlines use `text-heading`, paragraphs use `text-body`, links use `text-accent`.
-- `npm run check:brand` enforces this. A hook also runs it after every edit.
+- No hook enforces colors. `npm run check:brand` is optional.
