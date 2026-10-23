@@ -1,8 +1,4 @@
 {
-  "chrome-devtools-mcp": {
-    "command": "C:\\nvm4w\\nodejs\\chrome-devtools-mcp.cmd",
-    "args": []
-  },
   "mcpServers": {
     "atlassian": {
       "type": "http",
