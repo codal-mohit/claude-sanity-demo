@@ -20,10 +20,14 @@ Source of truth for project context. The `repo-overview` skill and the `code-ana
 src/
   app/
     globals.css        brand tokens (the only file with color values)
-    layout.tsx         root layout, loads fonts
-    page.tsx           demo landing page (breadcrumb, intro, feature cards)
+    layout.tsx         root layout: fonts, SiteHeader, <main>, SiteFooter
+    page.tsx           home page (/)
+    docs/page.tsx      setup page (/docs)
   components/ui/       shared components + co-located tests, barrel index.ts
-  lib/cn.ts            class-name joiner
+  components/sections/ page-level blocks + sections.test.tsx, barrel index.ts
+  data/                typed page content: site.ts, store.ts, docs.ts
+  lib/cn.ts            class-name joiner (+ cn.test.ts)
+  lib/format.ts        formatPrice (USD)
 scripts/check-brand.mjs  brand-token linter
 docs/                    this overview, setup guide, validation results
 .claude/                 Claude Code config (see below)
@@ -34,15 +38,27 @@ CLAUDE.md                project instructions loaded every session
 
 | Component | Purpose | Notes |
 |---|---|---|
-| `Button` | Action button | `primary` / `secondary` variants, extends button attributes |
+| `Button` | Action button | `primary` / `secondary` variants, extends button attributes. Exports `buttonClasses` |
+| `ButtonLink` | Link styled as a button | wraps `next/link`, same variants as `Button` |
+| `ProductCard` | Product tile | image, optional badge, category, `Price` |
+| `Price` | Price display | strikes through `compareAt` when on sale |
+| `ImagePlaceholder` | Image stand-in | `role="img"` with a label |
 | `Card` | Content tile | optional `tag` and `footer` |
 | `Tag` | Small label | DM Mono, uppercase |
 | `Breadcrumb` | Navigation trail | DM Mono, last item is `aria-current="page"` |
 | `Alert` | Inline message | `info` / `emphasis` tones, `role="status"` |
 
-## Home page
+## Routes and sections
 
-`page.tsx` renders a header with anchor nav, a hero, a three-step "How it works" list, five `Card`s for the configured rules, skills, commands, agents and hooks, a live `Alert` sample with verify results, and a footer.
+| Route | Composes | Data |
+|---|---|---|
+| `/` (demo store) | `StoreHero`, `PerksStrip`, `CategoryGrid`, `ProductGrid`, `Newsletter` (client) | `data/store.ts` |
+| `/docs` | `Breadcrumb`, `StepList`, `FeatureGrid`, `SampleTask` | `data/docs.ts` |
+| Both (layout) | `SiteHeader`, `SiteFooter` | `data/site.ts` |
+
+`SectionHeading` gives every section a consistent h2 that the section's `aria-labelledby` points at.
+
+See [website-flow.md](website-flow.md) for the home page flow, module by module.
 
 ## Color tokens
 

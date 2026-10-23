@@ -15,6 +15,7 @@ npm run verify   # lint, typecheck, brand check, tests
 - [Setup guide](docs/setup-guide.md): what is configured and how to use it
 - [Repository overview](docs/repository-overview.md): architecture and conventions
 - [Validation results](docs/validation-results.md): sample task and test results
+- [Website flow](docs/website-flow.md): home page flow, module by module
 
 ## Claude Code at a glance
 

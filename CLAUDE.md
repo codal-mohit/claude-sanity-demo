@@ -19,7 +19,10 @@ Demo app for AI-assisted development: a single branded landing page that shows h
 ## Layout
 
 - `src/app/`: routes. `globals.css` holds the brand tokens and is the only file allowed to contain color values.
+- `src/app/`: routes. `/` is a demo store home page, `/docs` explains the Claude Code setup. `layout.tsx` renders the shared header and footer.
 - `src/components/ui/`: shared presentational components. Export each one from `src/components/ui/index.ts`.
+- `src/components/sections/`: page-level blocks (header, store hero, product grid, footer) composed by the routes. Export from its `index.ts`.
+- `src/data/`: typed content for the pages (`site.ts`, `store.ts`, `docs.ts`). Put copy and lists here, not inline in components.
 - `src/lib/`: framework-free helpers. Only `cn.ts` (class names) exists today.
 - `scripts/`: repo tooling (`check-brand.mjs`). A PostToolUse hook (`.claude/hooks/brand-check-on-edit.mjs`) runs the brand check after edits.
 - `@/*` maps to `src/*`.
