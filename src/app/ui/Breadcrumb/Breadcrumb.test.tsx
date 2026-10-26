@@ -8,7 +8,7 @@ describe("Breadcrumbs", () => {
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "Journal", href: "/journal" },
+          { label: "Blog", href: "/blog" },
           { label: "Story" },
         ]}
       />,

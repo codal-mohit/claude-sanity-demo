@@ -52,7 +52,7 @@ export const link = defineType({
       name: 'url',
       title: 'URL',
       type: 'url',
-      description: 'A full URL, or a site path such as /journal.',
+      description: 'A full URL, or a site path such as /blog.',
       hidden: ({ parent }) => parent?.type !== 'external',
       validation: (rule) =>
         rule

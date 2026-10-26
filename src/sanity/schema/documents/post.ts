@@ -1,7 +1,7 @@
 import { DocumentTextIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
-import { contentGroups, seoField, slugField } from '../fields';
+import { contentGroups, languageField, reviewStatusField, seoField, slugField } from '../fields';
 
 export const post = defineType({
   name: 'post',
@@ -10,6 +10,7 @@ export const post = defineType({
   icon: DocumentTextIcon,
   groups: contentGroups,
   fields: [
+    languageField,
     defineField({
       name: 'title',
       title: 'Title',
@@ -89,6 +90,7 @@ export const post = defineType({
       type: 'url',
       group: 'meta',
     }),
+    reviewStatusField,
     seoField,
   ],
   orderings: [

@@ -511,13 +511,7 @@ function buildDocuments(assets) {
     description: 'A tech blog about building with Next.js, Sanity and Claude Code.',
   };
 
-  const redirect = {
-    _type: 'redirect',
-    _id: 'seed-redirect-journal',
-    source: '/journal',
-    destination: '/blog',
-    permanent: true,
-  };
+  const translated = buildTranslations({ posts, home });
 
   return [
     ...categories,
@@ -531,8 +525,121 @@ function buildDocuments(assets) {
     about,
     navigation,
     siteSettings,
-    redirect,
-  ];
+    ...translated,
+  ].map((doc) => (I18N_TYPES.has(doc._type) && !doc.language ? { ...doc, language: 'en' } : doc));
+}
+
+// ---------- translations ----------
+
+const I18N_TYPES = new Set(['post', 'page', 'series', 'event', 'docsArticle']);
+
+const TRANSLATIONS = {
+  'typed-groq-with-typegen': {
+    fr: {
+      title: 'Des requêtes GROQ typées avec Sanity TypeGen',
+      excerpt: 'Générez des types TypeScript depuis votre schéma et vos requêtes : un champ renommé casse le build, pas la page.',
+      intro: 'Les types écrits à la main dérivent dès qu’un éditeur ajoute un champ. TypeGen lit le schéma et chaque appel defineQuery, puis écrit les types exacts.',
+    },
+    de: {
+      title: 'Typisierte GROQ-Abfragen mit Sanity TypeGen',
+      excerpt: 'Erzeuge TypeScript-Typen aus Schema und Abfragen, damit ein umbenanntes Feld den Build bricht und nicht die Seite.',
+      intro: 'Handgeschriebene Typen für CMS-Daten veralten, sobald jemand ein Feld hinzufügt. TypeGen liest das Schema und jede defineQuery und schreibt exakte Typen.',
+    },
+  },
+  'claude-md-that-helps': {
+    fr: {
+      title: 'Écrire un CLAUDE.md vraiment utile',
+      excerpt: 'Des instructions courtes et précises valent mieux qu’un long guide de style. Ce qu’il faut mettre dans CLAUDE.md.',
+      intro: 'CLAUDE.md est lu au début de chaque session. Chaque ligne coûte de l’attention, elle doit donc changer un comportement.',
+    },
+    de: {
+      title: 'Eine CLAUDE.md, die wirklich hilft',
+      excerpt: 'Kurze, konkrete Projektanweisungen schlagen lange Styleguides. Was in CLAUDE.md gehört und was nicht.',
+      intro: 'CLAUDE.md wird zu Beginn jeder Sitzung gelesen. Jede Zeile kostet Aufmerksamkeit und sollte daher Verhalten ändern.',
+    },
+  },
+};
+
+const HOME_TRANSLATIONS = {
+  fr: {
+    heading: 'Notes sur la création d’applications web modernes',
+    text: 'Des articles pratiques sur Next.js, Sanity, GROQ et Claude Code. Chaque article contient du code qui fonctionne.',
+    latest: 'Derniers articles',
+    blog: 'Lire le blog',
+    series: 'Voir les séries',
+  },
+  de: {
+    heading: 'Notizen zum Bau moderner Web-Apps',
+    text: 'Praxisnahe Artikel zu Next.js, Sanity, GROQ und Claude Code. Jeder Beitrag enthält funktionierenden Code.',
+    latest: 'Neueste Artikel',
+    blog: 'Zum Blog',
+    series: 'Serien ansehen',
+  },
+};
+
+const metadataEntry = (lang, id) => ({
+  _key: lang,
+  _type: 'internationalizedArrayReferenceValue',
+  value: { _type: 'reference', _ref: id, _weak: true },
+});
+
+function buildTranslations({ posts, home }) {
+  const docs = [];
+
+  for (const [articleId, byLang] of Object.entries(TRANSLATIONS)) {
+    const source = posts.find((post) => post._id === `seed-post-${articleId}`);
+    const entries = [metadataEntry('en', source._id)];
+    for (const [lang, copy] of Object.entries(byLang)) {
+      const id = `${source._id}-${lang}`;
+      docs.push({
+        ...source,
+        _id: id,
+        language: lang,
+        title: copy.title,
+        excerpt: copy.excerpt,
+        body: [block(copy.intro), ...source.body.slice(1)],
+        seo: seo(copy.excerpt),
+      });
+      entries.push(metadataEntry(lang, id));
+    }
+    docs.push({
+      _type: 'translation.metadata',
+      _id: `seed-translation-${articleId}`,
+      translations: entries,
+      schemaTypes: ['post'],
+    });
+  }
+
+  const homeEntries = [metadataEntry('en', home._id)];
+  for (const [lang, copy] of Object.entries(HOME_TRANSLATIONS)) {
+    const id = `${home._id}-${lang}`;
+    const [hero, grid, ...rest] = home.blocks;
+    docs.push({
+      ...home,
+      _id: id,
+      language: lang,
+      seo: seo(copy.text),
+      blocks: [
+        {
+          ...hero,
+          heading: copy.heading,
+          text: copy.text,
+          links: [pathLink(copy.blog, '/blog'), pathLink(copy.series, '/series')],
+        },
+        { ...grid, heading: copy.latest },
+        ...rest,
+      ],
+    });
+    homeEntries.push(metadataEntry(lang, id));
+  }
+  docs.push({
+    _type: 'translation.metadata',
+    _id: 'seed-translation-home',
+    translations: homeEntries,
+    schemaTypes: ['page'],
+  });
+
+  return docs;
 }
 
 // ---------- run ----------

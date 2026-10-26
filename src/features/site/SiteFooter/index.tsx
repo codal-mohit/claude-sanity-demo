@@ -1,13 +1,15 @@
 import { SanityLink } from '@/features/content/SanityLink';
+import type { Lang } from '@/i18n/config';
 import type { NAVIGATION_QUERYResult } from '@/sanity/types';
 
 type SiteFooterProps = {
   title: string;
   description?: string | null;
+  lang: Lang;
   columns: NonNullable<NAVIGATION_QUERYResult>['footerColumns'];
 };
 
-export function SiteFooter({ title, description, columns }: SiteFooterProps) {
+export function SiteFooter({ title, description, lang, columns }: SiteFooterProps) {
   return (
     <footer className="border-border mt-24 border-t">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-5">
@@ -26,7 +28,7 @@ export function SiteFooter({ title, description, columns }: SiteFooterProps) {
             <ul className="mt-3 space-y-2 text-sm">
               {column.links?.map((link) => (
                 <li key={link._key}>
-                  <SanityLink link={link} className="hover:text-accent transition-colors" />
+                  <SanityLink link={link} lang={lang} className="hover:text-accent transition-colors" />
                 </li>
               ))}
             </ul>

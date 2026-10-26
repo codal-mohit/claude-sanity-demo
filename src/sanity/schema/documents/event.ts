@@ -1,7 +1,7 @@
 import { CalendarIcon } from '@sanity/icons';
 import { defineField, defineType } from 'sanity';
 
-import { contentGroups, seoField, slugField } from '../fields';
+import { contentGroups, languageField, reviewStatusField, seoField, slugField } from '../fields';
 
 export const event = defineType({
   name: 'event',
@@ -10,6 +10,7 @@ export const event = defineType({
   icon: CalendarIcon,
   groups: [...contentGroups, { name: 'when', title: 'When and where' }],
   fields: [
+    languageField,
     defineField({
       name: 'title',
       title: 'Title',
@@ -69,6 +70,7 @@ export const event = defineType({
       hidden: ({ document }) => document?.format === 'in-person',
     }),
     defineField({ name: 'ticketUrl', title: 'Ticket URL', type: 'url', group: 'meta' }),
+    reviewStatusField,
     seoField,
   ],
   orderings: [{ title: 'Soonest first', name: 'startsAtAsc', by: [{ field: 'startsAt', direction: 'asc' }] }],

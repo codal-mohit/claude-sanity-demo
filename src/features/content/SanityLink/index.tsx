@@ -5,12 +5,13 @@ import { linkHref, type ResolvedLink } from '@/sanity/links';
 
 type SanityLinkProps = {
   link: (ResolvedLink & { label?: string | null; openInNewTab?: boolean | null }) | null | undefined;
+  lang?: string;
   className?: string;
   children?: ReactNode;
 };
 
-export function SanityLink({ link, className, children }: SanityLinkProps) {
-  const href = linkHref(link);
+export function SanityLink({ link, lang, className, children }: SanityLinkProps) {
+  const href = linkHref(link, lang);
   if (!link || !href) return null;
 
   const content = children ?? link.label;

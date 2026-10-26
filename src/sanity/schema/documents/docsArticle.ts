@@ -1,7 +1,7 @@
 import { BookIcon } from '@sanity/icons';
 import { defineField, defineType } from 'sanity';
 
-import { contentGroups, seoField, slugField } from '../fields';
+import { contentGroups, languageField, reviewStatusField, seoField, slugField } from '../fields';
 
 export const docsArticle = defineType({
   name: 'docsArticle',
@@ -10,6 +10,7 @@ export const docsArticle = defineType({
   icon: BookIcon,
   groups: contentGroups,
   fields: [
+    languageField,
     defineField({
       name: 'title',
       title: 'Title',
@@ -50,6 +51,7 @@ export const docsArticle = defineType({
       options: { list: ['v1', 'v2'] },
       initialValue: 'v2',
     }),
+    reviewStatusField,
     seoField,
   ],
   orderings: [{ title: 'Manual order', name: 'orderAsc', by: [{ field: 'order', direction: 'asc' }] }],

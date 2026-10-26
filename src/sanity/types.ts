@@ -293,12 +293,57 @@ export type Slug = {
   source?: string;
 };
 
+export type TranslationMetadata = {
+  _id: string;
+  _type: "translation.metadata";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  translations?: InternationalizedArrayReference;
+  schemaTypes?: Array<string>;
+};
+
+export type InternationalizedArrayReference = Array<{
+  _key: string;
+} & InternationalizedArrayReferenceValue>;
+
+export type InternationalizedArrayReferenceValue = {
+  _type: "internationalizedArrayReferenceValue";
+  value?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "post";
+  } | {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "page";
+  } | {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "series";
+  } | {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "event";
+  } | {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "docsArticle";
+  };
+};
+
 export type Post = {
   _id: string;
   _type: "post";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: string;
   title?: string;
   slug?: Slug;
   excerpt?: string;
@@ -321,6 +366,7 @@ export type Post = {
   featured?: boolean;
   tags?: Array<string>;
   repoUrl?: string;
+  reviewStatus?: "draft" | "in-review" | "approved";
   seo?: Seo;
 };
 
@@ -344,6 +390,7 @@ export type Event = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: string;
   title?: string;
   slug?: Slug;
   summary?: string;
@@ -356,6 +403,7 @@ export type Event = {
   location?: Geopoint;
   onlineUrl?: string;
   ticketUrl?: string;
+  reviewStatus?: "draft" | "in-review" | "approved";
   seo?: Seo;
 };
 
@@ -372,6 +420,7 @@ export type DocsArticle = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: string;
   title?: string;
   slug?: Slug;
   parent?: {
@@ -384,6 +433,7 @@ export type DocsArticle = {
   summary?: string;
   body?: PortableText;
   version?: "v1" | "v2";
+  reviewStatus?: "draft" | "in-review" | "approved";
   seo?: Seo;
 };
 
@@ -393,6 +443,7 @@ export type Series = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: string;
   title?: string;
   slug?: Slug;
   summary?: string;
@@ -404,6 +455,7 @@ export type Series = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "post";
   }>;
+  reviewStatus?: "draft" | "in-review" | "approved";
   seo?: Seo;
 };
 
@@ -413,6 +465,7 @@ export type Page = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: string;
   title?: string;
   slug?: Slug;
   blocks?: Array<{
@@ -428,6 +481,7 @@ export type Page = {
   } & Gallery | {
     _key: string;
   } & FormBlock>;
+  reviewStatus?: "draft" | "in-review" | "approved";
   seo?: Seo;
 };
 
@@ -536,7 +590,7 @@ export type SanityImageAsset = {
   source?: SanityAssetSourceData;
 };
 
-export type AllSanitySchemaTypes = FormBlock | Gallery | FaqBlock | Cta | StoryGrid | Hero | CodeBlock | Callout | PortableText | Link | ImageWithAlt | Seo | SiteSettings | Redirect | Navigation | Faq | Category | Slug | Post | Author | Event | Geopoint | DocsArticle | Series | Page | SanityImageCrop | SanityImageHotspot | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset;
+export type AllSanitySchemaTypes = FormBlock | Gallery | FaqBlock | Cta | StoryGrid | Hero | CodeBlock | Callout | PortableText | Link | ImageWithAlt | Seo | SiteSettings | Redirect | Navigation | Faq | Category | Slug | TranslationMetadata | InternationalizedArrayReference | InternationalizedArrayReferenceValue | Post | Author | Event | Geopoint | DocsArticle | Series | Page | SanityImageCrop | SanityImageHotspot | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/sanity/queries.ts
 // Variable: SETTINGS_QUERY
@@ -600,12 +654,17 @@ export type NAVIGATION_QUERYResult = {
   }> | null;
 } | null;
 // Variable: PAGE_QUERY
-// Query: *[_type == "page" && slug.current == $slug][0]{  _id,  _type,  title,  seo,  blocks[]{    ...,    _type == "hero" => { ..., image{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions}, links[]{  _key,  label,  type,  url,  openInNewTab,  "reference": reference->{ _type, "slug": slug.current }} },    _type == "cta" => { ..., link{  _key,  label,  type,  url,  openInNewTab,  "reference": reference->{ _type, "slug": slug.current }} },    _type == "gallery" => { ..., images[]{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },    _type == "faqBlock" => { ..., "items": items[]->{ _id, question, answer } },    _type == "storyGrid" => {      ...,      "posts": select(        mode == "manual" => posts[]->{  _id,  title,  "slug": slug.current,  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }},        mode == "category" => *[_type == "post" && references(^.category._ref)] | order(publishedAt desc) [0...12] {  _id,  title,  "slug": slug.current,  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }},        *[_type == "post"] | order(publishedAt desc) [0...12] {  _id,  title,  "slug": slug.current,  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }}      )    }  }}
+// Query: coalesce(  *[_type == "page" && slug.current == $slug && coalesce(language, "en") == $lang][0],  *[_type == "page" && slug.current == $slug && coalesce(language, "en") == "en"][0]){  _id,  _type,  title,  "language": coalesce(language, "en"),  seo,  "translations": *[_type == "translation.metadata" && references(^._id)][0].translations[]{  "lang": _key,  "slug": value->slug.current},  blocks[]{    ...,    _type == "hero" => { ..., image{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions}, links[]{  _key,  label,  type,  url,  openInNewTab,  "reference": reference->{ _type, "slug": slug.current }} },    _type == "cta" => { ..., link{  _key,  label,  type,  url,  openInNewTab,  "reference": reference->{ _type, "slug": slug.current }} },    _type == "gallery" => { ..., images[]{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },    _type == "faqBlock" => { ..., "items": items[]->{ _id, question, answer } },    _type == "storyGrid" => {      ...,      "posts": select(        mode == "manual" => posts[]->{  _id,  title,  "slug": slug.current,  "language": coalesce(language, "en"),  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }},        mode == "category" => *[_type == "post" && references(^.category._ref) && (  coalesce(language, "en") == $lang  || (    coalesce(language, "en") == "en"    && count(*[_type == "translation.metadata" && references(^._id)].translations[_key == $lang]) == 0  ))] | order(publishedAt desc) [0...12] {  _id,  title,  "slug": slug.current,  "language": coalesce(language, "en"),  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }},        *[_type == "post" && (  coalesce(language, "en") == $lang  || (    coalesce(language, "en") == "en"    && count(*[_type == "translation.metadata" && references(^._id)].translations[_key == $lang]) == 0  ))] | order(publishedAt desc) [0...12] {  _id,  title,  "slug": slug.current,  "language": coalesce(language, "en"),  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }}      )    }  }}
 export type PAGE_QUERYResult = {
   _id: string;
   _type: "page";
   title: string | null;
+  language: string | "en";
   seo: Seo | null;
+  translations: Array<{
+    lang: string;
+    slug: string | null;
+  }> | null;
   blocks: Array<{
     _key: string;
     _type: "cta";
@@ -742,6 +801,7 @@ export type PAGE_QUERYResult = {
       _id: string;
       title: string | null;
       slug: string | null;
+      language: string | "en";
       excerpt: string | null;
       publishedAt: string | null;
       featured: boolean | null;
@@ -795,15 +855,13 @@ export type PAGE_QUERYResult = {
     limit?: number;
   }> | null;
 } | null;
-// Variable: PAGE_SLUGS_QUERY
-// Query: *[_type == "page" && defined(slug.current) && slug.current != "home"].slug.current
-export type PAGE_SLUGS_QUERYResult = Array<string | null>;
 // Variable: POSTS_QUERY
-// Query: *[  _type == "post"  && defined(slug.current)  && (!defined($category) || $category in categories[]->slug.current)  && (!defined($topic) || $topic in tags)] | order(publishedAt desc) [0...24] {  _id,  title,  "slug": slug.current,  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }}
+// Query: *[  _type == "post"  && defined(slug.current)  && (  coalesce(language, "en") == $lang  || (    coalesce(language, "en") == "en"    && count(*[_type == "translation.metadata" && references(^._id)].translations[_key == $lang]) == 0  ))  && (!defined($category) || $category in categories[]->slug.current)  && (!defined($topic) || $topic in tags)] | order(publishedAt desc) [$start...$end] {  _id,  title,  "slug": slug.current,  "language": coalesce(language, "en"),  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }}
 export type POSTS_QUERYResult = Array<{
   _id: string;
   title: string | null;
   slug: string | null;
+  language: string | "en";
   excerpt: string | null;
   publishedAt: string | null;
   featured: boolean | null;
@@ -854,6 +912,40 @@ export type POSTS_QUERYResult = Array<{
     slug: string | null;
   }> | null;
 }>;
+// Variable: POSTS_COUNT_QUERY
+// Query: count(*[  _type == "post"  && defined(slug.current)  && (  coalesce(language, "en") == $lang  || (    coalesce(language, "en") == "en"    && count(*[_type == "translation.metadata" && references(^._id)].translations[_key == $lang]) == 0  ))  && (!defined($category) || $category in categories[]->slug.current)  && (!defined($topic) || $topic in tags)])
+export type POSTS_COUNT_QUERYResult = number;
+// Variable: SEARCH_QUERY
+// Query: *[  _type in ["post", "series", "event", "docsArticle"]  && defined(slug.current)  && (  coalesce(language, "en") == $lang  || (    coalesce(language, "en") == "en"    && count(*[_type == "translation.metadata" && references(^._id)].translations[_key == $lang]) == 0  ))  && [title, excerpt, summary, tags, pt::text(body)] match $q]| score(    boost(title match $q, 4),    boost(tags match $q, 2),    boost(excerpt match $q, 2),    boost(summary match $q, 2),    pt::text(body) match $q  )| order(_score desc, _updatedAt desc) [0...20] {  _id,  _type,  title,  "slug": slug.current,  "snippet": coalesce(excerpt, summary),  tags}
+export type SEARCH_QUERYResult = Array<{
+  _id: string;
+  _type: "docsArticle";
+  title: string | null;
+  slug: string | null;
+  snippet: string | null;
+  tags: null;
+} | {
+  _id: string;
+  _type: "event";
+  title: string | null;
+  slug: string | null;
+  snippet: string | null;
+  tags: null;
+} | {
+  _id: string;
+  _type: "post";
+  title: string | null;
+  slug: string | null;
+  snippet: string | null;
+  tags: Array<string> | null;
+} | {
+  _id: string;
+  _type: "series";
+  title: string | null;
+  slug: string | null;
+  snippet: string | null;
+  tags: null;
+}>;
 // Variable: CATEGORIES_QUERY
 // Query: *[_type == "category" && count(*[_type == "post" && references(^._id)]) > 0] | order(title asc){ _id, title, "slug": slug.current }
 export type CATEGORIES_QUERYResult = Array<{
@@ -865,11 +957,12 @@ export type CATEGORIES_QUERYResult = Array<{
 // Query: array::unique(*[_type == "post" && defined(tags)].tags[])
 export type TAGS_QUERYResult = Array<string>;
 // Variable: POST_QUERY
-// Query: *[_type == "post" && slug.current == $slug][0]{  ...{  _id,  title,  "slug": slug.current,  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }},  seo,  repoUrl,  body[]{  ...,  _type == "imageWithAlt" => {  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  markDefs[]{    ...,    _type == "internalLink" => { ..., "reference": reference->{ _type, "slug": slug.current } }  }},  "series": *[_type == "series" && references(^._id)][0]{    title,    "slug": slug.current,    "articles": articles[]->{ _id, title, "slug": slug.current }  },  "related": *[    _type == "post"    && _id != ^._id    && count(coalesce(tags, [])[@ in coalesce(^.tags, [])]) > 0  ] | order(publishedAt desc) [0...3] {  _id,  title,  "slug": slug.current,  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }}}
+// Query: coalesce(  *[_type == "post" && slug.current == $slug && coalesce(language, "en") == $lang][0],  *[_type == "post" && slug.current == $slug && coalesce(language, "en") == "en"][0]){  ...{  _id,  title,  "slug": slug.current,  "language": coalesce(language, "en"),  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }},  seo,  repoUrl,  "translations": *[_type == "translation.metadata" && references(^._id)][0].translations[]{  "lang": _key,  "slug": value->slug.current},  body[]{  ...,  _type == "imageWithAlt" => {  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  markDefs[]{    ...,    _type == "internalLink" => { ..., "reference": reference->{ _type, "slug": slug.current } }  }},  "series": *[_type == "series" && references(^._id)][0]{    title,    "slug": slug.current,    "articles": articles[]->{ _id, title, "slug": slug.current }  },  "related": *[    _type == "post"    && _id != ^._id    && coalesce(language, "en") == coalesce(^.language, "en")    && count(coalesce(tags, [])[@ in coalesce(^.tags, [])]) > 0  ] | order(publishedAt desc) [0...3] {  _id,  title,  "slug": slug.current,  "language": coalesce(language, "en"),  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }}}
 export type POST_QUERYResult = {
   _id: string;
   title: string | null;
   slug: string | null;
+  language: string | "en";
   excerpt: string | null;
   publishedAt: string | null;
   featured: boolean | null;
@@ -921,6 +1014,10 @@ export type POST_QUERYResult = {
   }> | null;
   seo: Seo | null;
   repoUrl: string | null;
+  translations: Array<{
+    lang: string;
+    slug: string | null;
+  }> | null;
   body: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -1003,6 +1100,7 @@ export type POST_QUERYResult = {
     _id: string;
     title: string | null;
     slug: string | null;
+    language: string | "en";
     excerpt: string | null;
     publishedAt: string | null;
     featured: boolean | null;
@@ -1054,11 +1152,8 @@ export type POST_QUERYResult = {
     }> | null;
   }>;
 } | null;
-// Variable: POST_SLUGS_QUERY
-// Query: *[_type == "post" && defined(slug.current)].slug.current
-export type POST_SLUGS_QUERYResult = Array<string | null>;
 // Variable: SERIES_LIST_QUERY
-// Query: *[_type == "series" && defined(slug.current)] | order(title asc){  _id,  title,  "slug": slug.current,  summary,  "count": count(articles)}
+// Query: *[_type == "series" && defined(slug.current) && (  coalesce(language, "en") == $lang  || (    coalesce(language, "en") == "en"    && count(*[_type == "translation.metadata" && references(^._id)].translations[_key == $lang]) == 0  ))] | order(title asc){  _id,  title,  "slug": slug.current,  summary,  "count": count(articles)}
 export type SERIES_LIST_QUERYResult = Array<{
   _id: string;
   title: string | null;
@@ -1067,13 +1162,18 @@ export type SERIES_LIST_QUERYResult = Array<{
   count: number | null;
 }>;
 // Variable: SERIES_QUERY
-// Query: *[_type == "series" && slug.current == $slug][0]{  _id,  title,  "slug": slug.current,  summary,  seo,  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "articles": articles[]->{  _id,  title,  "slug": slug.current,  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }}}
+// Query: coalesce(  *[_type == "series" && slug.current == $slug && coalesce(language, "en") == $lang][0],  *[_type == "series" && slug.current == $slug && coalesce(language, "en") == "en"][0]){  _id,  title,  "slug": slug.current,  "language": coalesce(language, "en"),  summary,  seo,  "translations": *[_type == "translation.metadata" && references(^._id)][0].translations[]{  "lang": _key,  "slug": value->slug.current},  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "articles": articles[]->{  _id,  title,  "slug": slug.current,  "language": coalesce(language, "en"),  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }}}
 export type SERIES_QUERYResult = {
   _id: string;
   title: string | null;
   slug: string | null;
+  language: string | "en";
   summary: string | null;
   seo: Seo | null;
+  translations: Array<{
+    lang: string;
+    slug: string | null;
+  }> | null;
   coverImage: {
     _type: "imageWithAlt";
     asset?: {
@@ -1095,6 +1195,7 @@ export type SERIES_QUERYResult = {
     _id: string;
     title: string | null;
     slug: string | null;
+    language: string | "en";
     excerpt: string | null;
     publishedAt: string | null;
     featured: boolean | null;
@@ -1146,30 +1247,351 @@ export type SERIES_QUERYResult = {
     }> | null;
   }> | null;
 } | null;
-// Variable: SERIES_SLUGS_QUERY
-// Query: *[_type == "series" && defined(slug.current)].slug.current
-export type SERIES_SLUGS_QUERYResult = Array<string | null>;
+// Variable: EVENTS_QUERY
+// Query: *[_type == "event" && defined(slug.current) && (  coalesce(language, "en") == $lang  || (    coalesce(language, "en") == "en"    && count(*[_type == "translation.metadata" && references(^._id)].translations[_key == $lang]) == 0  ))] | order(startsAt desc) {  _id,  title,  "slug": slug.current,  summary,  startsAt,  endsAt,  format,  venue,  image{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions}}
+export type EVENTS_QUERYResult = Array<{
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  summary: string | null;
+  startsAt: string | null;
+  endsAt: string | null;
+  format: "hybrid" | "in-person" | "online" | null;
+  venue: string | null;
+  image: {
+    _type: "imageWithAlt";
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    decorative?: boolean;
+    caption?: string;
+    lqip: string | null;
+    dimensions: SanityImageDimensions | null;
+  } | null;
+}>;
+// Variable: EVENT_QUERY
+// Query: coalesce(  *[_type == "event" && slug.current == $slug && coalesce(language, "en") == $lang][0],  *[_type == "event" && slug.current == $slug && coalesce(language, "en") == "en"][0]){  ...{  _id,  title,  "slug": slug.current,  summary,  startsAt,  endsAt,  format,  venue,  image{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions}},  "language": coalesce(language, "en"),  seo,  "translations": *[_type == "translation.metadata" && references(^._id)][0].translations[]{  "lang": _key,  "slug": value->slug.current},  location,  onlineUrl,  ticketUrl,  body[]{  ...,  _type == "imageWithAlt" => {  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  markDefs[]{    ...,    _type == "internalLink" => { ..., "reference": reference->{ _type, "slug": slug.current } }  }}}
+export type EVENT_QUERYResult = {
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  summary: string | null;
+  startsAt: string | null;
+  endsAt: string | null;
+  format: "hybrid" | "in-person" | "online" | null;
+  venue: string | null;
+  image: {
+    _type: "imageWithAlt";
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    decorative?: boolean;
+    caption?: string;
+    lqip: string | null;
+    dimensions: SanityImageDimensions | null;
+  } | null;
+  language: string | "en";
+  seo: Seo | null;
+  translations: Array<{
+    lang: string;
+    slug: string | null;
+  }> | null;
+  location: Geopoint | null;
+  onlineUrl: string | null;
+  ticketUrl: string | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs: Array<{
+      href?: string;
+      openInNewTab?: boolean;
+      _type: "externalLink";
+      _key: string;
+    } | {
+      reference: {
+        _type: "docsArticle";
+        slug: string | null;
+      } | {
+        _type: "event";
+        slug: string | null;
+      } | {
+        _type: "page";
+        slug: string | null;
+      } | {
+        _type: "post";
+        slug: string | null;
+      } | {
+        _type: "series";
+        slug: string | null;
+      } | null;
+      _type: "internalLink";
+      _key: string;
+    }> | null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    _key: string;
+    _type: "callout";
+    tone?: "info" | "tip" | "warning";
+    text?: string;
+    markDefs: null;
+  } | {
+    _key: string;
+    _type: "codeBlock";
+    language?: "bash" | "css" | "go" | "groq" | "html" | "javascript" | "json" | "python" | "sql" | "tsx" | "typescript" | "yaml";
+    filename?: string;
+    code?: string;
+    markDefs: null;
+  } | {
+    _key: string;
+    _type: "imageWithAlt";
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    decorative?: boolean;
+    caption?: string;
+    lqip: string | null;
+    dimensions: SanityImageDimensions | null;
+    markDefs: null;
+  }> | null;
+} | null;
+// Variable: DOCS_NAV_QUERY
+// Query: *[_type == "docsArticle" && defined(slug.current) && (  coalesce(language, "en") == $lang  || (    coalesce(language, "en") == "en"    && count(*[_type == "translation.metadata" && references(^._id)].translations[_key == $lang]) == 0  ))] | order(order asc, title asc){  _id,  title,  "slug": slug.current,  "parentId": parent._ref}
+export type DOCS_NAV_QUERYResult = Array<{
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  parentId: string | null;
+}>;
+// Variable: DOCS_ARTICLE_QUERY
+// Query: coalesce(  *[_type == "docsArticle" && slug.current == $slug && coalesce(language, "en") == $lang][0],  *[_type == "docsArticle" && slug.current == $slug && coalesce(language, "en") == "en"][0]){  _id,  title,  "slug": slug.current,  "language": coalesce(language, "en"),  summary,  version,  seo,  _updatedAt,  "translations": *[_type == "translation.metadata" && references(^._id)][0].translations[]{  "lang": _key,  "slug": value->slug.current},  "parent": parent->{ title, "slug": slug.current },  body[]{  ...,  _type == "imageWithAlt" => {  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  markDefs[]{    ...,    _type == "internalLink" => { ..., "reference": reference->{ _type, "slug": slug.current } }  }}}
+export type DOCS_ARTICLE_QUERYResult = {
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  language: string | "en";
+  summary: string | null;
+  version: "v1" | "v2" | null;
+  seo: Seo | null;
+  _updatedAt: string;
+  translations: Array<{
+    lang: string;
+    slug: string | null;
+  }> | null;
+  parent: {
+    title: string | null;
+    slug: string | null;
+  } | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs: Array<{
+      href?: string;
+      openInNewTab?: boolean;
+      _type: "externalLink";
+      _key: string;
+    } | {
+      reference: {
+        _type: "docsArticle";
+        slug: string | null;
+      } | {
+        _type: "event";
+        slug: string | null;
+      } | {
+        _type: "page";
+        slug: string | null;
+      } | {
+        _type: "post";
+        slug: string | null;
+      } | {
+        _type: "series";
+        slug: string | null;
+      } | null;
+      _type: "internalLink";
+      _key: string;
+    }> | null;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    _key: string;
+    _type: "callout";
+    tone?: "info" | "tip" | "warning";
+    text?: string;
+    markDefs: null;
+  } | {
+    _key: string;
+    _type: "codeBlock";
+    language?: "bash" | "css" | "go" | "groq" | "html" | "javascript" | "json" | "python" | "sql" | "tsx" | "typescript" | "yaml";
+    filename?: string;
+    code?: string;
+    markDefs: null;
+  } | {
+    _key: string;
+    _type: "imageWithAlt";
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    decorative?: boolean;
+    caption?: string;
+    lqip: string | null;
+    dimensions: SanityImageDimensions | null;
+    markDefs: null;
+  }> | null;
+} | null;
+// Variable: AUTHOR_QUERY
+// Query: *[_type == "author" && slug.current == $slug][0]{  _id,  name,  role,  bio,  socials,  avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "articles": *[_type == "post" && references(^._id) && (  coalesce(language, "en") == $lang  || (    coalesce(language, "en") == "en"    && count(*[_type == "translation.metadata" && references(^._id)].translations[_key == $lang]) == 0  ))] | order(publishedAt desc) {  _id,  title,  "slug": slug.current,  "language": coalesce(language, "en"),  excerpt,  publishedAt,  featured,  tags,  "characters": length(pt::text(body)),  coverImage{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions},  "author": author->{ name, role, "slug": slug.current, avatar{  ...,  "lqip": asset->metadata.lqip,  "dimensions": asset->metadata.dimensions} },  "categories": categories[]->{ _id, title, "slug": slug.current }}}
+export type AUTHOR_QUERYResult = {
+  _id: string;
+  name: string | null;
+  role: string | null;
+  bio: string | null;
+  socials: Array<string> | null;
+  avatar: {
+    _type: "imageWithAlt";
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    decorative?: boolean;
+    caption?: string;
+    lqip: string | null;
+    dimensions: SanityImageDimensions | null;
+  } | null;
+  articles: Array<{
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    language: string | "en";
+    excerpt: string | null;
+    publishedAt: string | null;
+    featured: boolean | null;
+    tags: Array<string> | null;
+    characters: number;
+    coverImage: {
+      _type: "imageWithAlt";
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      decorative?: boolean;
+      caption?: string;
+      lqip: string | null;
+      dimensions: SanityImageDimensions | null;
+    } | null;
+    author: {
+      name: string | null;
+      role: string | null;
+      slug: string | null;
+      avatar: {
+        _type: "imageWithAlt";
+        asset?: {
+          _ref: string;
+          _type: "reference";
+          _weak?: boolean;
+          [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+        };
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt?: string;
+        decorative?: boolean;
+        caption?: string;
+        lqip: string | null;
+        dimensions: SanityImageDimensions | null;
+      } | null;
+    } | null;
+    categories: Array<{
+      _id: string;
+      title: string | null;
+      slug: string | null;
+    }> | null;
+  }>;
+} | null;
 // Variable: SITEMAP_QUERY
-// Query: *[  _type in ["page", "post", "series", "event", "docsArticle"]  && defined(slug.current)  && coalesce(seo.noIndex, false) == false]{ _type, "slug": slug.current, _updatedAt }
+// Query: *[  _type in ["page", "post", "series", "event", "docsArticle", "author"]  && defined(slug.current)  && coalesce(seo.noIndex, false) == false]{ _type, "slug": slug.current, "language": coalesce(language, "en"), _updatedAt }
 export type SITEMAP_QUERYResult = Array<{
+  _type: "author";
+  slug: string | null;
+  language: "en";
+  _updatedAt: string;
+} | {
   _type: "docsArticle";
   slug: string | null;
+  language: string | "en";
   _updatedAt: string;
 } | {
   _type: "event";
   slug: string | null;
+  language: string | "en";
   _updatedAt: string;
 } | {
   _type: "page";
   slug: string | null;
+  language: string | "en";
   _updatedAt: string;
 } | {
   _type: "post";
   slug: string | null;
+  language: string | "en";
   _updatedAt: string;
 } | {
   _type: "series";
   slug: string | null;
+  language: string | "en";
   _updatedAt: string;
 }>;
 
@@ -1179,16 +1601,20 @@ declare module "@sanity/client" {
   interface SanityQueries {
     "*[_type == \"siteSettings\"][0]{ title, description }": SETTINGS_QUERYResult;
     "*[_type == \"navigation\"][0]{\n  header[]{\n  _key,\n  label,\n  type,\n  url,\n  openInNewTab,\n  \"reference\": reference->{ _type, \"slug\": slug.current }\n},\n  footerColumns[]{ _key, title, links[]{\n  _key,\n  label,\n  type,\n  url,\n  openInNewTab,\n  \"reference\": reference->{ _type, \"slug\": slug.current }\n} }\n}": NAVIGATION_QUERYResult;
-    "*[_type == \"page\" && slug.current == $slug][0]{\n  _id,\n  _type,\n  title,\n  seo,\n  blocks[]{\n    ...,\n    _type == \"hero\" => { ..., image{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n}, links[]{\n  _key,\n  label,\n  type,\n  url,\n  openInNewTab,\n  \"reference\": reference->{ _type, \"slug\": slug.current }\n} },\n    _type == \"cta\" => { ..., link{\n  _key,\n  label,\n  type,\n  url,\n  openInNewTab,\n  \"reference\": reference->{ _type, \"slug\": slug.current }\n} },\n    _type == \"gallery\" => { ..., images[]{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n    _type == \"faqBlock\" => { ..., \"items\": items[]->{ _id, question, answer } },\n    _type == \"storyGrid\" => {\n      ...,\n      \"posts\": select(\n        mode == \"manual\" => posts[]->{\n  _id,\n  title,\n  \"slug\": slug.current,\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n},\n        mode == \"category\" => *[_type == \"post\" && references(^.category._ref)] | order(publishedAt desc) [0...12] {\n  _id,\n  title,\n  \"slug\": slug.current,\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n},\n        *[_type == \"post\"] | order(publishedAt desc) [0...12] {\n  _id,\n  title,\n  \"slug\": slug.current,\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n}\n      )\n    }\n  }\n}": PAGE_QUERYResult;
-    "*[_type == \"page\" && defined(slug.current) && slug.current != \"home\"].slug.current": PAGE_SLUGS_QUERYResult;
-    "*[\n  _type == \"post\"\n  && defined(slug.current)\n  && (!defined($category) || $category in categories[]->slug.current)\n  && (!defined($topic) || $topic in tags)\n] | order(publishedAt desc) [0...24] {\n  _id,\n  title,\n  \"slug\": slug.current,\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n}": POSTS_QUERYResult;
+    "coalesce(\n  *[_type == \"page\" && slug.current == $slug && coalesce(language, \"en\") == $lang][0],\n  *[_type == \"page\" && slug.current == $slug && coalesce(language, \"en\") == \"en\"][0]\n){\n  _id,\n  _type,\n  title,\n  \"language\": coalesce(language, \"en\"),\n  seo,\n  \"translations\": *[_type == \"translation.metadata\" && references(^._id)][0].translations[]{\n  \"lang\": _key,\n  \"slug\": value->slug.current\n},\n  blocks[]{\n    ...,\n    _type == \"hero\" => { ..., image{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n}, links[]{\n  _key,\n  label,\n  type,\n  url,\n  openInNewTab,\n  \"reference\": reference->{ _type, \"slug\": slug.current }\n} },\n    _type == \"cta\" => { ..., link{\n  _key,\n  label,\n  type,\n  url,\n  openInNewTab,\n  \"reference\": reference->{ _type, \"slug\": slug.current }\n} },\n    _type == \"gallery\" => { ..., images[]{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n    _type == \"faqBlock\" => { ..., \"items\": items[]->{ _id, question, answer } },\n    _type == \"storyGrid\" => {\n      ...,\n      \"posts\": select(\n        mode == \"manual\" => posts[]->{\n  _id,\n  title,\n  \"slug\": slug.current,\n  \"language\": coalesce(language, \"en\"),\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n},\n        mode == \"category\" => *[_type == \"post\" && references(^.category._ref) && (\n  coalesce(language, \"en\") == $lang\n  || (\n    coalesce(language, \"en\") == \"en\"\n    && count(*[_type == \"translation.metadata\" && references(^._id)].translations[_key == $lang]) == 0\n  )\n)] | order(publishedAt desc) [0...12] {\n  _id,\n  title,\n  \"slug\": slug.current,\n  \"language\": coalesce(language, \"en\"),\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n},\n        *[_type == \"post\" && (\n  coalesce(language, \"en\") == $lang\n  || (\n    coalesce(language, \"en\") == \"en\"\n    && count(*[_type == \"translation.metadata\" && references(^._id)].translations[_key == $lang]) == 0\n  )\n)] | order(publishedAt desc) [0...12] {\n  _id,\n  title,\n  \"slug\": slug.current,\n  \"language\": coalesce(language, \"en\"),\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n}\n      )\n    }\n  }\n}": PAGE_QUERYResult;
+    "*[\n  _type == \"post\"\n  && defined(slug.current)\n  && (\n  coalesce(language, \"en\") == $lang\n  || (\n    coalesce(language, \"en\") == \"en\"\n    && count(*[_type == \"translation.metadata\" && references(^._id)].translations[_key == $lang]) == 0\n  )\n)\n  && (!defined($category) || $category in categories[]->slug.current)\n  && (!defined($topic) || $topic in tags)\n] | order(publishedAt desc) [$start...$end] {\n  _id,\n  title,\n  \"slug\": slug.current,\n  \"language\": coalesce(language, \"en\"),\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n}": POSTS_QUERYResult;
+    "count(*[\n  _type == \"post\"\n  && defined(slug.current)\n  && (\n  coalesce(language, \"en\") == $lang\n  || (\n    coalesce(language, \"en\") == \"en\"\n    && count(*[_type == \"translation.metadata\" && references(^._id)].translations[_key == $lang]) == 0\n  )\n)\n  && (!defined($category) || $category in categories[]->slug.current)\n  && (!defined($topic) || $topic in tags)\n])": POSTS_COUNT_QUERYResult;
+    "*[\n  _type in [\"post\", \"series\", \"event\", \"docsArticle\"]\n  && defined(slug.current)\n  && (\n  coalesce(language, \"en\") == $lang\n  || (\n    coalesce(language, \"en\") == \"en\"\n    && count(*[_type == \"translation.metadata\" && references(^._id)].translations[_key == $lang]) == 0\n  )\n)\n  && [title, excerpt, summary, tags, pt::text(body)] match $q\n]\n| score(\n    boost(title match $q, 4),\n    boost(tags match $q, 2),\n    boost(excerpt match $q, 2),\n    boost(summary match $q, 2),\n    pt::text(body) match $q\n  )\n| order(_score desc, _updatedAt desc) [0...20] {\n  _id,\n  _type,\n  title,\n  \"slug\": slug.current,\n  \"snippet\": coalesce(excerpt, summary),\n  tags\n}": SEARCH_QUERYResult;
     "*[_type == \"category\" && count(*[_type == \"post\" && references(^._id)]) > 0] | order(title asc){ _id, title, \"slug\": slug.current }": CATEGORIES_QUERYResult;
     "array::unique(*[_type == \"post\" && defined(tags)].tags[])": TAGS_QUERYResult;
-    "*[_type == \"post\" && slug.current == $slug][0]{\n  ...{\n  _id,\n  title,\n  \"slug\": slug.current,\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n},\n  seo,\n  repoUrl,\n  body[]{\n  ...,\n  _type == \"imageWithAlt\" => {\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  markDefs[]{\n    ...,\n    _type == \"internalLink\" => { ..., \"reference\": reference->{ _type, \"slug\": slug.current } }\n  }\n},\n  \"series\": *[_type == \"series\" && references(^._id)][0]{\n    title,\n    \"slug\": slug.current,\n    \"articles\": articles[]->{ _id, title, \"slug\": slug.current }\n  },\n  \"related\": *[\n    _type == \"post\"\n    && _id != ^._id\n    && count(coalesce(tags, [])[@ in coalesce(^.tags, [])]) > 0\n  ] | order(publishedAt desc) [0...3] {\n  _id,\n  title,\n  \"slug\": slug.current,\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n}\n}": POST_QUERYResult;
-    "*[_type == \"post\" && defined(slug.current)].slug.current": POST_SLUGS_QUERYResult;
-    "*[_type == \"series\" && defined(slug.current)] | order(title asc){\n  _id,\n  title,\n  \"slug\": slug.current,\n  summary,\n  \"count\": count(articles)\n}": SERIES_LIST_QUERYResult;
-    "*[_type == \"series\" && slug.current == $slug][0]{\n  _id,\n  title,\n  \"slug\": slug.current,\n  summary,\n  seo,\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"articles\": articles[]->{\n  _id,\n  title,\n  \"slug\": slug.current,\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n}\n}": SERIES_QUERYResult;
-    "*[_type == \"series\" && defined(slug.current)].slug.current": SERIES_SLUGS_QUERYResult;
-    "*[\n  _type in [\"page\", \"post\", \"series\", \"event\", \"docsArticle\"]\n  && defined(slug.current)\n  && coalesce(seo.noIndex, false) == false\n]{ _type, \"slug\": slug.current, _updatedAt }": SITEMAP_QUERYResult;
+    "coalesce(\n  *[_type == \"post\" && slug.current == $slug && coalesce(language, \"en\") == $lang][0],\n  *[_type == \"post\" && slug.current == $slug && coalesce(language, \"en\") == \"en\"][0]\n){\n  ...{\n  _id,\n  title,\n  \"slug\": slug.current,\n  \"language\": coalesce(language, \"en\"),\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n},\n  seo,\n  repoUrl,\n  \"translations\": *[_type == \"translation.metadata\" && references(^._id)][0].translations[]{\n  \"lang\": _key,\n  \"slug\": value->slug.current\n},\n  body[]{\n  ...,\n  _type == \"imageWithAlt\" => {\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  markDefs[]{\n    ...,\n    _type == \"internalLink\" => { ..., \"reference\": reference->{ _type, \"slug\": slug.current } }\n  }\n},\n  \"series\": *[_type == \"series\" && references(^._id)][0]{\n    title,\n    \"slug\": slug.current,\n    \"articles\": articles[]->{ _id, title, \"slug\": slug.current }\n  },\n  \"related\": *[\n    _type == \"post\"\n    && _id != ^._id\n    && coalesce(language, \"en\") == coalesce(^.language, \"en\")\n    && count(coalesce(tags, [])[@ in coalesce(^.tags, [])]) > 0\n  ] | order(publishedAt desc) [0...3] {\n  _id,\n  title,\n  \"slug\": slug.current,\n  \"language\": coalesce(language, \"en\"),\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n}\n}": POST_QUERYResult;
+    "*[_type == \"series\" && defined(slug.current) && (\n  coalesce(language, \"en\") == $lang\n  || (\n    coalesce(language, \"en\") == \"en\"\n    && count(*[_type == \"translation.metadata\" && references(^._id)].translations[_key == $lang]) == 0\n  )\n)] | order(title asc){\n  _id,\n  title,\n  \"slug\": slug.current,\n  summary,\n  \"count\": count(articles)\n}": SERIES_LIST_QUERYResult;
+    "coalesce(\n  *[_type == \"series\" && slug.current == $slug && coalesce(language, \"en\") == $lang][0],\n  *[_type == \"series\" && slug.current == $slug && coalesce(language, \"en\") == \"en\"][0]\n){\n  _id,\n  title,\n  \"slug\": slug.current,\n  \"language\": coalesce(language, \"en\"),\n  summary,\n  seo,\n  \"translations\": *[_type == \"translation.metadata\" && references(^._id)][0].translations[]{\n  \"lang\": _key,\n  \"slug\": value->slug.current\n},\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"articles\": articles[]->{\n  _id,\n  title,\n  \"slug\": slug.current,\n  \"language\": coalesce(language, \"en\"),\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n}\n}": SERIES_QUERYResult;
+    "*[_type == \"event\" && defined(slug.current) && (\n  coalesce(language, \"en\") == $lang\n  || (\n    coalesce(language, \"en\") == \"en\"\n    && count(*[_type == \"translation.metadata\" && references(^._id)].translations[_key == $lang]) == 0\n  )\n)] | order(startsAt desc) {\n  _id,\n  title,\n  \"slug\": slug.current,\n  summary,\n  startsAt,\n  endsAt,\n  format,\n  venue,\n  image{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n}\n}": EVENTS_QUERYResult;
+    "coalesce(\n  *[_type == \"event\" && slug.current == $slug && coalesce(language, \"en\") == $lang][0],\n  *[_type == \"event\" && slug.current == $slug && coalesce(language, \"en\") == \"en\"][0]\n){\n  ...{\n  _id,\n  title,\n  \"slug\": slug.current,\n  summary,\n  startsAt,\n  endsAt,\n  format,\n  venue,\n  image{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n}\n},\n  \"language\": coalesce(language, \"en\"),\n  seo,\n  \"translations\": *[_type == \"translation.metadata\" && references(^._id)][0].translations[]{\n  \"lang\": _key,\n  \"slug\": value->slug.current\n},\n  location,\n  onlineUrl,\n  ticketUrl,\n  body[]{\n  ...,\n  _type == \"imageWithAlt\" => {\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  markDefs[]{\n    ...,\n    _type == \"internalLink\" => { ..., \"reference\": reference->{ _type, \"slug\": slug.current } }\n  }\n}\n}": EVENT_QUERYResult;
+    "*[_type == \"docsArticle\" && defined(slug.current) && (\n  coalesce(language, \"en\") == $lang\n  || (\n    coalesce(language, \"en\") == \"en\"\n    && count(*[_type == \"translation.metadata\" && references(^._id)].translations[_key == $lang]) == 0\n  )\n)] | order(order asc, title asc){\n  _id,\n  title,\n  \"slug\": slug.current,\n  \"parentId\": parent._ref\n}": DOCS_NAV_QUERYResult;
+    "coalesce(\n  *[_type == \"docsArticle\" && slug.current == $slug && coalesce(language, \"en\") == $lang][0],\n  *[_type == \"docsArticle\" && slug.current == $slug && coalesce(language, \"en\") == \"en\"][0]\n){\n  _id,\n  title,\n  \"slug\": slug.current,\n  \"language\": coalesce(language, \"en\"),\n  summary,\n  version,\n  seo,\n  _updatedAt,\n  \"translations\": *[_type == \"translation.metadata\" && references(^._id)][0].translations[]{\n  \"lang\": _key,\n  \"slug\": value->slug.current\n},\n  \"parent\": parent->{ title, \"slug\": slug.current },\n  body[]{\n  ...,\n  _type == \"imageWithAlt\" => {\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  markDefs[]{\n    ...,\n    _type == \"internalLink\" => { ..., \"reference\": reference->{ _type, \"slug\": slug.current } }\n  }\n}\n}": DOCS_ARTICLE_QUERYResult;
+    "*[_type == \"author\" && slug.current == $slug][0]{\n  _id,\n  name,\n  role,\n  bio,\n  socials,\n  avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"articles\": *[_type == \"post\" && references(^._id) && (\n  coalesce(language, \"en\") == $lang\n  || (\n    coalesce(language, \"en\") == \"en\"\n    && count(*[_type == \"translation.metadata\" && references(^._id)].translations[_key == $lang]) == 0\n  )\n)] | order(publishedAt desc) {\n  _id,\n  title,\n  \"slug\": slug.current,\n  \"language\": coalesce(language, \"en\"),\n  excerpt,\n  publishedAt,\n  featured,\n  tags,\n  \"characters\": length(pt::text(body)),\n  coverImage{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n},\n  \"author\": author->{ name, role, \"slug\": slug.current, avatar{\n  ...,\n  \"lqip\": asset->metadata.lqip,\n  \"dimensions\": asset->metadata.dimensions\n} },\n  \"categories\": categories[]->{ _id, title, \"slug\": slug.current }\n}\n}": AUTHOR_QUERYResult;
+    "*[\n  _type in [\"page\", \"post\", \"series\", \"event\", \"docsArticle\", \"author\"]\n  && defined(slug.current)\n  && coalesce(seo.noIndex, false) == false\n]{ _type, \"slug\": slug.current, \"language\": coalesce(language, \"en\"), _updatedAt }": SITEMAP_QUERYResult;
   }
 }

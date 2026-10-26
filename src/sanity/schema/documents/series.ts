@@ -1,7 +1,7 @@
 import { BookIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
-import { contentGroups, seoField, slugField } from '../fields';
+import { contentGroups, languageField, reviewStatusField, seoField, slugField } from '../fields';
 
 export const series = defineType({
   name: 'series',
@@ -10,6 +10,7 @@ export const series = defineType({
   icon: BookIcon,
   groups: contentGroups,
   fields: [
+    languageField,
     defineField({
       name: 'title',
       title: 'Title',
@@ -35,6 +36,7 @@ export const series = defineType({
       of: [defineArrayMember({ type: 'reference', to: [{ type: 'post' }] })],
       validation: (rule) => rule.required().min(2).unique(),
     }),
+    reviewStatusField,
     seoField,
   ],
   preview: {

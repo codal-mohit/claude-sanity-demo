@@ -7,6 +7,7 @@ const article: ArticleCardData = {
   _id: 'a1',
   title: 'GROQ joins in practice',
   slug: 'groq-joins',
+  language: 'en',
   excerpt: 'How references and projections fit together.',
   publishedAt: '2026-10-20T09:00:00.000Z',
   featured: false,
@@ -27,6 +28,13 @@ describe('ArticleCard', () => {
     render(<ArticleCard article={article} />);
     expect(screen.getByRole('link', { name: '#groq' })).toHaveAttribute('href', '/blog?tag=groq');
     expect(screen.getByText(/5 min read/)).toBeInTheDocument();
+  });
+
+  it('localizes links and labels', () => {
+    render(<ArticleCard article={article} lang="fr" />);
+    expect(screen.getByRole('link', { name: 'GROQ joins in practice' })).toHaveAttribute('href', '/fr/blog/groq-joins');
+    expect(screen.getByRole('link', { name: '#groq' })).toHaveAttribute('href', '/fr/blog?tag=groq');
+    expect(screen.getByText(/5 min de lecture/)).toBeInTheDocument();
   });
 
   it('renders nothing without a slug', () => {

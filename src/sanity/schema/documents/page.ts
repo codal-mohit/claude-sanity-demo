@@ -1,7 +1,7 @@
 import { DocumentIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
-import { contentGroups, seoField, slugField } from '../fields';
+import { contentGroups, languageField, reviewStatusField, seoField, slugField } from '../fields';
 
 export const pageBlockTypes = ['hero', 'storyGrid', 'cta', 'faqBlock', 'gallery', 'formBlock'];
 
@@ -12,6 +12,7 @@ export const page = defineType({
   icon: DocumentIcon,
   groups: contentGroups,
   fields: [
+    languageField,
     defineField({
       name: 'title',
       title: 'Title',
@@ -32,6 +33,7 @@ export const page = defineType({
         },
       },
     }),
+    reviewStatusField,
     seoField,
   ],
   preview: {

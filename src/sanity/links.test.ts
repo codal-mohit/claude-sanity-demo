@@ -33,6 +33,18 @@ describe('linkHref', () => {
   });
 });
 
+describe('localized links', () => {
+  it('prefixes references and site paths for non-default languages', () => {
+    expect(resolveHref({ _type: 'post', slug: 'x' }, 'fr')).toBe('/fr/blog/x');
+    expect(resolveHref({ _type: 'page', slug: 'home' }, 'de')).toBe('/de');
+    expect(linkHref({ type: 'external', url: '/blog' }, 'fr')).toBe('/fr/blog');
+  });
+
+  it('never prefixes full URLs', () => {
+    expect(linkHref({ type: 'external', url: 'https://sanity.io' }, 'fr')).toBe('https://sanity.io');
+  });
+});
+
 describe('readingMinutes', () => {
   it('rounds to whole minutes with a minimum of one', () => {
     expect(readingMinutes(0)).toBe(1);

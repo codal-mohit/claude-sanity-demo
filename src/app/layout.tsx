@@ -14,6 +14,8 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
+  // Makes canonical and hreflang URLs absolute, as search engines require.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
   title: { default: 'Sanity Claude Demo', template: '%s | Sanity Claude Demo' },
   description: 'A tech blog about building with Next.js, Sanity and Claude Code.',
 };

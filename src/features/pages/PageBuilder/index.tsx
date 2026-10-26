@@ -3,6 +3,7 @@ import { ArticleCard } from '@/features/blog/ArticleCard';
 import { PortableTextBody } from '@/features/content/PortableTextBody';
 import { SanityImage } from '@/features/content/SanityImage';
 import { SanityLink } from '@/features/content/SanityLink';
+import { DEFAULT_LANG, type Lang } from '@/i18n/config';
 import type { PAGE_QUERYResult } from '@/sanity/types';
 import { cn } from '@/utils';
 
@@ -26,7 +27,7 @@ function Section({ heading, children, className }: { heading?: string | null; ch
   );
 }
 
-function Hero({ block }: { block: BlockOf<'hero'> }) {
+function Hero({ block, lang }: { block: BlockOf<'hero'>; lang: Lang }) {
   return (
     <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="flex flex-col gap-5">
@@ -43,6 +44,7 @@ function Hero({ block }: { block: BlockOf<'hero'> }) {
               <SanityLink
                 key={link._key}
                 link={link}
+                lang={lang}
                 className={cn(
                   'rounded-xl px-5 py-3 text-sm font-semibold transition-colors',
                   index === 0
@@ -63,14 +65,14 @@ function Hero({ block }: { block: BlockOf<'hero'> }) {
   );
 }
 
-function ArticleGrid({ block }: { block: BlockOf<'storyGrid'> }) {
+function ArticleGrid({ block, lang }: { block: BlockOf<'storyGrid'>; lang: Lang }) {
   const posts = (block.posts ?? []).slice(0, block.mode === 'manual' ? undefined : (block.limit ?? 6));
   if (!posts.length) return null;
   return (
     <Section heading={block.heading}>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {posts.map((post) => (
-          <ArticleCard key={post._id} article={post} />
+          <ArticleCard key={post._id} article={post} lang={lang} />
         ))}
       </div>
     </Section>
@@ -83,19 +85,19 @@ const ctaTone = {
   accent: 'bg-primary text-white',
 };
 
-function Cta({ block }: { block: BlockOf<'cta'> }) {
+function Cta({ block, lang }: { block: BlockOf<'cta'>; lang: Lang }) {
   return (
     <Section>
       <div className={cn('flex flex-col items-start gap-4 rounded-3xl p-10 sm:p-12', ctaTone[block.tone ?? 'accent'])}>
         <h2 className="text-3xl font-bold text-inherit">{block.heading}</h2>
         {block.text ? <p className="max-w-xl">{block.text}</p> : null}
-        <SanityLink link={block.link} className="text-secondary-900 rounded-xl bg-white px-5 py-3 text-sm font-semibold" />
+        <SanityLink link={block.link} lang={lang} className="text-secondary-900 rounded-xl bg-white px-5 py-3 text-sm font-semibold" />
       </div>
     </Section>
   );
 }
 
-function Faq({ block }: { block: BlockOf<'faqBlock'> }) {
+function Faq({ block, lang }: { block: BlockOf<'faqBlock'>; lang: Lang }) {
   if (!block.items?.length) return null;
   return (
     <Section heading={block.heading}>
@@ -108,7 +110,7 @@ function Faq({ block }: { block: BlockOf<'faqBlock'> }) {
                 +
               </span>
             </summary>
-            <PortableTextBody value={item.answer} />
+            <PortableTextBody value={item.answer} lang={lang} />
           </details>
         ))}
       </div>
@@ -174,20 +176,20 @@ function FormBlock({ block }: { block: BlockOf<'formBlock'> }) {
   );
 }
 
-export function PageBuilder({ blocks }: { blocks: Blocks | null | undefined }) {
+export function PageBuilder({ blocks, lang = DEFAULT_LANG }: { blocks: Blocks | null | undefined; lang?: Lang }) {
   if (!blocks?.length) return null;
   return (
     <>
       {blocks.map((block) => {
         switch (block._type) {
           case 'hero':
-            return <Hero key={block._key} block={block} />;
+            return <Hero key={block._key} block={block} lang={lang} />;
           case 'storyGrid':
-            return <ArticleGrid key={block._key} block={block} />;
+            return <ArticleGrid key={block._key} block={block} lang={lang} />;
           case 'cta':
-            return <Cta key={block._key} block={block} />;
+            return <Cta key={block._key} block={block} lang={lang} />;
           case 'faqBlock':
-            return <Faq key={block._key} block={block} />;
+            return <Faq key={block._key} block={block} lang={lang} />;
           case 'gallery':
             return <Gallery key={block._key} block={block} />;
           case 'formBlock':
