@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Meridian: a multilingual editorial and commerce platform built with Next.js 15 (App Router), React 19, TypeScript (strict), Tailwind CSS v4, Vitest and Sanity CMS. It is also a learning project for Claude Code capabilities. The product has no AI features and makes no Claude API calls.
+Sanity Claude Demo: a tech blog (articles, series, tags, docs, events) built with Next.js 15 (App Router), React 19, TypeScript (strict), Tailwind CSS v4, Vitest and Sanity CMS. It is also a learning project for Claude Code capabilities. The product has no AI features and makes no Claude API calls.
 
 ## Commands
 
@@ -19,7 +19,10 @@ Meridian: a multilingual editorial and commerce platform built with Next.js 15 (
 - `src/app/ui/<Name>/index.tsx`: shared primitives (Button, Card, Breadcrumb). One folder per component, with its test beside it.
 - `src/utils/`: `cn` helper. `src/icons/`: SVG icon components.
 - `@/*` maps to `src/*`.
-- Planned: `src/sanity/` (schema, client, Studio customization), `src/features/` (journal, gear, events, docs, site), `migrations/`.
+- `src/app/(site)/`: public routes (`/`, `/[slug]`, `/blog`, `/blog/[slug]`, `/series`, `/series/[slug]`). `src/app/studio/`: embedded Studio.
+- `src/sanity/`: schema, `queries.ts` (all GROQ, `defineQuery`), client, live fetch, Studio customization. Run `npm run typegen` after schema or query changes.
+- `src/features/`: `blog`, `content` (image, link, portable text), `pages` (page builder), `site` (header, footer).
+- `tools/seed.mjs`: sample content, `npm run seed`. Dark-first theme: `<html class="dark">`, tokens in `globals.css`.
 
 ## Rules
 

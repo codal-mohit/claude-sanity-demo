@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Manrope } from 'next/font/google';
+import { DM_Mono, Manrope } from 'next/font/google';
 import './globals.css';
 
 const manrope = Manrope({
@@ -7,9 +7,15 @@ const manrope = Manrope({
   subsets: ['latin'],
 });
 
+const dmMono = DM_Mono({
+  variable: '--font-dm-mono',
+  subsets: ['latin'],
+  weight: ['400', '500'],
+});
+
 export const metadata: Metadata = {
-  title: 'Claude Code Demo',
-  description: 'Next.js demo with the Claude API',
+  title: { default: 'Sanity Claude Demo', template: '%s | Sanity Claude Demo' },
+  description: 'A tech blog about building with Next.js, Sanity and Claude Code.',
 };
 
 export default function RootLayout({
@@ -18,8 +24,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${manrope.variable} antialiased`}>{children}</body>
+    <html lang="en" className="dark">
+      <body className={`${manrope.variable} ${dmMono.variable} antialiased`}>{children}</body>
     </html>
   );
 }

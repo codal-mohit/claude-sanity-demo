@@ -1,11 +1,26 @@
 @import 'tailwindcss';
 
+/* Dark-first: the root layout sets class="dark" on <html>, so dark: utilities always apply. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #f9f9f9;
   --headline: #0b111f;
   --foreground: #393c45;
   --accent: #3416f5;
   --surface: #ffffff;
+  --border: #dcdde1;
+  --grid-line: rgb(11 17 31 / 0.05);
+}
+
+.dark {
+  --background: #0b111f;
+  --headline: #ffffff;
+  --foreground: #c4c6cc;
+  --accent: #d7d5fd;
+  --surface: #121a2c;
+  --border: #232c42;
+  --grid-line: rgb(215 213 253 / 0.04);
 }
 
 @theme {
@@ -37,21 +52,23 @@
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
   --color-surface: var(--surface);
+  --color-border: var(--border);
+  --font-sans: var(--font-manrope);
+  --font-mono: var(--font-dm-mono);
   --font-manrope: var(--font-manrope);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b111f;
-    --headline: #ffffff;
-    --foreground: #f9f9f9;
-    --accent: #d7d5fd;
-    --surface: #131a2b;
-  }
-}
-
 body {
-  background: var(--background);
+  background-color: var(--background);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
   color: var(--foreground);
   font-family: var(--font-manrope), sans-serif;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--background);
 }
