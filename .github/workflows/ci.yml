@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      # Repository variables (Settings > Secrets and variables > Actions > Variables).
+      # The project ID is public; schema extract needs a real one. Tests never call the API.
+      NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+      NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET || 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint, typecheck and test
+        run: npm run verify
+      - name: Generated Sanity types are up to date
+        run: |
+          npm run typegen
+          git diff --exit-code -- src/sanity/types.ts src/sanity/extract.json \
+            || (echo "::error::Run npm run typegen and commit the result." && exit 1)

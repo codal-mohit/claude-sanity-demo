@@ -1,29 +1,20 @@
-# Runs Claude Code headless on every pull request and posts a review
-# using the same rules and code-reviewer agent as local sessions.
+# Runs Claude Code on every pull request and posts one review comment,
+# using the same reviewer subagent and rules as local sessions.
 # Requires the ANTHROPIC_API_KEY repository secret.
 name: Claude review
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, ready_for_review]
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
-  verify:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run verify
-
   review:
     # Fork PRs never get the API key or a write token.
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -37,7 +28,10 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          claude_args: --allowedTools "Read,Grep,Glob,Task,Bash(git diff:*),Bash(gh pr comment:*)"
+          claude_args: >-
+            --allowedTools "Read,Grep,Glob,Task,Bash(git diff:*),Bash(git log:*),Bash(gh pr comment:*)"
           prompt: |
-            Use the code-reviewer agent to review this pull request against .claude/rules/.
-            Post the findings as one PR comment, most severe first. If nothing is wrong, say so.
+            Use the reviewer subagent to review this pull request (base ${{ github.event.pull_request.base.ref }})
+            against CLAUDE.md and .claude/rules/.
+            Post the findings as one PR comment with `gh pr comment ${{ github.event.pull_request.number }}`,
+            most severe first, one line each. If nothing is wrong, say so in one line.

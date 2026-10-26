@@ -1,13 +1,9 @@
 ---
-description: Review uncommitted changes against project rules using the code-reviewer agent
-argument-hint: "[optional path or focus]"
-allowed-tools: Bash(git diff:*), Bash(git status:*)
+description: Review the current branch diff against the project rules, using the reviewer subagent.
 ---
 
-Changed files:
+Use the `reviewer` subagent to review `git diff main...HEAD` plus uncommitted changes against `.claude/rules/` and `CLAUDE.md`.
 
-!`git status --short`
+Report findings most severe first as `path:line: problem. fix.` If nothing is wrong, say so in one line. Do not edit files.
 
-Use the `code-reviewer` agent to review the current uncommitted diff (`git diff HEAD`). Focus: $ARGUMENTS
-
-Pass the agent the diff and tell it to check against `.claude/rules/`. Relay its findings unchanged.
+$ARGUMENTS

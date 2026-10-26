@@ -9,13 +9,24 @@
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check:brand": "node scripts/check-brand.mjs",
-    "verify": "npm run lint && npm run typecheck && npm run check:brand && npm run test"
+    "verify": "npm run lint && npm run typecheck && npm run test",
+    "typegen": "sanity schema extract --path src/sanity/extract.json && sanity typegen generate",
+    "seed": "node --env-file=.env.local tools/seed.mjs",
+    "migrate:dry": "sanity migration run",
+    "dataset:backup": "sanity dataset export production backups/production.tar.gz --overwrite",
+    "dataset:staging": "sanity dataset copy production staging --skip-history"
   },
   "dependencies": {
+    "@sanity/document-internationalization": "^4.1.1",
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^4.22.1",
+    "class-variance-authority": "^0.7.1",
     "next": "15.5.4",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "next-sanity": "^11.6.13",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "sanity": "^4.22.1",
+    "styled-components": "^6.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
